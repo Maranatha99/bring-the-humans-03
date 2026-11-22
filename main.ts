@@ -12,8 +12,10 @@
 // house reads the video's views from TikTok. Places go by views, most
 // first; the top 20 share $500. Only views from real people count.
 //
-// VIDEO.json here holds a placeholder address until the video is posted;
-// replace it with the video's full TikTok address before submitting.
+// VIDEO.json names the real posted video:
+// https://www.tiktok.com/@irvkandji99/video/7710993658203442453
+// (posted publicly 22 Nov 2026 from @irvkandji99). The guard below still
+// refuses a placeholder, so a future edit can never silently ship one.
 
 import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -31,7 +33,9 @@ if (
   !video.url.startsWith("https://www.tiktok.com/") ||
   video.url.includes("REPLACE_WITH_VIDEO_ID")
 ) {
-  console.error(`VIDEO.json does not name a real TikTok video: ${video.url}`);
+  console.error(
+    `VIDEO.json does not name a real TikTok video (expected https://www.tiktok.com/@irvkandji99/video/<id>): ${video.url}`,
+  );
   process.exit(1);
 }
 try {
