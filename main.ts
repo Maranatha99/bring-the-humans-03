@@ -15,15 +15,27 @@
 // VIDEO.json here holds a placeholder address until the video is posted;
 // replace it with the video's full TikTok address before submitting.
 
-import { copyFileSync, mkdirSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? "/bot";
 const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 
 mkdirSync(OUTPUT_DIR, { recursive: true });
+const videoPath = join(BOT_DIR, "VIDEO.json");
+// Refuse to ship a placeholder: VIDEO.json must name the real posted
+// TikTok address (https://www.tiktok.com/@irvkandji99/video/<id>).
+const video = JSON.parse(readFileSync(videoPath, "utf8")) as { url?: unknown };
+if (
+  typeof video.url !== "string" ||
+  !video.url.startsWith("https://www.tiktok.com/") ||
+  video.url.includes("REPLACE_WITH_VIDEO_ID")
+) {
+  console.error(`VIDEO.json does not name a real TikTok video: ${video.url}`);
+  process.exit(1);
+}
 try {
-  copyFileSync(join(BOT_DIR, "VIDEO.json"), join(OUTPUT_DIR, "VIDEO.json"));
+  copyFileSync(videoPath, join(OUTPUT_DIR, "VIDEO.json"));
 } catch (err) {
   console.error(
     `VIDEO.json could not be copied from ${BOT_DIR}: ${(err as Error).message}`,
